@@ -1,1 +1,1 @@
-export { SidebarWithHeader as AdminLayout } from './Admin';
+export { SidebarWithHeader as Dashboard } from './Dashboard';

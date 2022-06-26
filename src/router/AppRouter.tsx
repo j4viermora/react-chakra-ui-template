@@ -1,38 +1,46 @@
-import { AdminLayout } from 'layout';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { privateRoutes, publicRoutes } from './routes';
+import { Dashboard } from 'layout';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from 'react-router-dom';
+import { privateRoutes } from './dashboard.routes';
+import { publicRoutes } from './routes';
 
 export const AppRouter = () => {
-	const isAuthenticated = false;
-	return (
-		<BrowserRouter>
-			{isAuthenticated ? (
-				<AdminLayout>
-					<Routes>
-						{privateRoutes.map(({ component: Component, path }) => {
-							return (
-								<Route
-									key={path}
-									path={path}
-									element={<Component />}
-								/>
-							);
-						})}
-					</Routes>
-				</AdminLayout>
-			) : (
-				<Routes>
-					{publicRoutes.map(({ component: Component, path }) => {
-						return (
-							<Route
-								key={path}
-								path={path}
-								element={<Component />}
-							/>
-						);
-					})}
-				</Routes>
-			)}
-		</BrowserRouter>
-	);
+  const isAuthenticated = true;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path='/app'
+          element={
+            isAuthenticated ? <Dashboard /> : <Navigate to='/auth/login' />
+          }>
+          {privateRoutes.map(({ path, component: Component, name }) => (
+            <Route key={name} path={path} element={<Component />} />
+          ))}
+        </Route>
+        <Route
+          path='/auth'
+          element={isAuthenticated ? <Navigate to='/app' /> : <Outlet />}>
+          {publicRoutes.map(({ path, name, component: Component }) => (
+            <Route key={name} path={path} element={<Component />} />
+          ))}
+        </Route>
+        <Route
+          path='*'
+          element={
+            isAuthenticated ? (
+              <Navigate to='/app' />
+            ) : (
+              <Navigate to='/auth/login' />
+            )
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 };
